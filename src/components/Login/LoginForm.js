@@ -7,7 +7,9 @@ import { Parallax, Background } from "react-parallax";
 import Button from "@material-ui/core/Button";
 import {TextField } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
-import { useTranslation, withTranslation } from 'react-i18next';
+import {useTranslation} from "react-i18next";
+import { withTranslation } from 'react-i18next';
+
 
 let LoginForm = (props) => {
     console.log( "Hey I am form Component::::", props)
@@ -17,11 +19,9 @@ let LoginForm = (props) => {
         logIn(data);
     };
 
-    const { t, i18n } = useTranslation();
+    const [t, i18n] = useTranslation('common');
 
     const { image, title, title2, parallaxStrength, buttonText, height, darkMode } = props;
-    if (!props.data) return <div>Suraj Shukla</div>
-    debugger
     return (
             <Parallax
                 style={{ height }}
@@ -35,7 +35,6 @@ let LoginForm = (props) => {
                     paddingTop={`calc(${height}px/3)`}
                 >
                     <form onSubmit={handleSubmit(onSubmit)}>
-                    {/* <label>{t('en')}</label>     */}
                         <TextField
                             label={title}
                             // variant="Input"
@@ -63,6 +62,9 @@ let LoginForm = (props) => {
                         </Button>
                     </form>
                 </Box>
+                <h1>{t('welcome.title', {framework:'React'})}</h1>
+                <button onClick={() => i18n.changeLanguage('en')}>en</button>
+                <button onClick={() => i18n.changeLanguage('gu')}>gu</button>
                 <Background className="custom-bg">
                     <img src={image} alt="img" />
                 </Background>
@@ -77,10 +79,10 @@ const mapStateToProps = (state) => {
     };
 };
 const mapDispatchToProps = (dispatch) => {
-  return {
+return {
     logIn: (user) => dispatch(LoginAction.LogIn(user)),
     changeLanguage: (data) => dispatch(getTranslationAction.changeLanguage(data))
-  };
+};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(LoginForm));
+export default withTranslation('common')(connect(mapStateToProps, mapDispatchToProps)(LoginForm));

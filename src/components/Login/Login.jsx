@@ -1,50 +1,31 @@
 import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { connect } from "react-redux";
-import LoginAction from "../../_actions/login.actions";
 import getTranslationAction from "../../_actions/translation.action"
-import i18n from 'i18next'
-import LanguageDetector from "i18next-browser-languagedetector"
-import {reactI18nextModule} from 'react-i18next'
-import XHR from 'i18next-xhr-backend'
 import { I18nextProvider } from 'react-i18next';
 import LoginForm from "./LoginForm"
+import i18next from "i18next";
+import common_en from "../../translations/en/common"
+import common_gu from "../../translations/gu/common"
+import common_hi from "../../translations/hi/common"
 
-function translation (data) {
-    console.log(data.en)
-    i18n
-    .use(XHR)
-    .use(LanguageDetector)  
-    .use(reactI18nextModule)
-    .init({
+const loadTranslation = (translations) =>{
+    i18next.init({
+        interpolation: { escapeValue : false},
+        lang: 'en',
         resources: {
-            en: data.en,
-            // gu: data.gu,
-            // hi: data.hi,
-        },
-        /* default language when load the website in browser */
-        lng: "en",
-        /* When react i18next not finding any language to as default in borwser */
-        fallbackLng: "en",
-        /* debugger For Development environment */
-        debug: true,
-        ns: ["translations"],
-        defaultNS: "translations",
-        keySeparator: ".",
-        interpolation: {
-            escapeValue: false, 
-            formatSeparator: ","
-        },
-        react: {
-            wait: true,
-            bindI18n: 'languageChanged loaded',
-            bindStore: 'added removed',
-            nsMode: 'default'
+            en: {
+                common: common_en(translations)
+            },
+            gu:{
+                common: common_gu(translations)
+            },
+            hi:{
+                common: common_hi(translations)
+            }
         }
     })
-    return i18n
+    return i18next
 }
-
 
 let Login = (props) => {
     useEffect(() =>{
@@ -53,17 +34,17 @@ let Login = (props) => {
 
     const { image, title, title2, parallaxStrength, buttonText, height, darkMode} = props;
     
-    if (!props.data) return <div>Suraj Shukla</div>
+    if (props.loading) return <div>Loading...</div>
     return (
-        <I18nextProvider i18n={translation(props.data)}>
+        <I18nextProvider i18n={loadTranslation(props.translations)}>
             <LoginForm 
-            image={image}
-            title={title}
-            title2={title2}
-            parallaxStrength = {parallaxStrength}
-            buttonText = {buttonText}
-            height = {height}
-            darkMode = {darkMode}
+                image={image}
+                title={title}
+                title2={title2}
+                parallaxStrength = {parallaxStrength}
+                buttonText = {buttonText}
+                height = {height}
+                darkMode = {darkMode}
             />
         </I18nextProvider>
     );
@@ -71,13 +52,15 @@ let Login = (props) => {
 
 const mapStateToProps = (state) => {
     return {
-        data: state.translationReducer.data
+        loading: state.translationReducer.loading,
+        translations: state.translationReducer.translations
     };
 };
+
 const mapDispatchToProps = (dispatch) => {
-  return {
-    getTranslation: () => dispatch(getTranslationAction.getTranslation()),
-  };
+    return {
+        getTranslation: () => dispatch(getTranslationAction.getTranslation()),
+    };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);
